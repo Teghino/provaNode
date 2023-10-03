@@ -3,8 +3,9 @@ const router = express.Router('../index.js');
 const fs = require('fs');
 const bodyParser = require('body-parser');
 
-router.use(bodyParser.json());
+//router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
+router.use(express.static('public'));
 
 router.post('/login', (req, res) => {
     const dati = req.body;
@@ -18,7 +19,7 @@ router.post('/login', (req, res) => {
           res.send("benvenuto");
           return;
         }
-        res.send("Utente non registrato");
+        res.sendFile('accessofallito.html', {root :'C:\/Users\/tacch\/Documents\/Scuola\/TIPSIT\/provaNode\/public'});
     });
   });
   
@@ -35,7 +36,7 @@ router.post('/register', (req, res) => {
       password: dati.password
     }
     if(datiEsistenti.find((d) => dati.username === d.username && dati.password === d.password)){
-      res.send("Utente già registrato");
+      res.sendFile('registrazionefallita.html', {root: 'C:\/Users\/tacch\/Documents\/Scuola\/TIPSIT\/provaNode\/public'});
       return;
     }
       // Analizza il JSON esistente in un oggetto JavaScript
@@ -49,6 +50,7 @@ router.post('/register', (req, res) => {
         console.error('Errore durante la scrittura del file JSON:', err);
       } else {
         console.log('Nuovo oggetto aggiunto con successo al file JSON');
+        res.send("Utente registrato con successo");
       }
     });
   });
