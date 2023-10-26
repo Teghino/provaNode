@@ -13,8 +13,8 @@ app.use(express.static('public'));
 
 app.get('/', (req, res) => {
     res.sendFile('login.html', {root: __dirname + '/public'});
-    
 });
+
 
 
 

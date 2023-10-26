@@ -5,10 +5,9 @@ const User = sequelize.define('account', {
   email: {
     type: Sequelize.STRING,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
   },
   psw: Sequelize.STRING,
-  id: false,
   // Altri campi della tabella Utenti
 });
 
