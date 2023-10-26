@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const { dir } = require('console');
 const { dirname } = require('path');
 const sequelize = require('../sql/seq.js');
+const User = require('../sql/modello.js');
+const Sequelize = require('sequelize');
 
 
 //router.use(bodyParser.json());
@@ -13,11 +15,31 @@ router.use(express.static('public'));
 
 router.post('/login', (req, res) => {
     const dati = req.body;
-    console.log(sequelize);
+    User.findAll().then((users) => {
+        console.log('Elenco di utenti:', users);
+      }).catch((error) => {
+        console.error('Errore:', error);
+      });
+        // Chiudi la connessione al database quando hai finito
 });
   
 router.post('/register', (req, res) => {
     const dati = req.body;
-    
+      User.create({
+        email: 'Nome Utente',
+        psw: 'email@esempio.com'
+      })
+        .catch((error) => {
+          console.error('Errore durante l\'inserimento dell\'utente:', error);
+        });
+          // Chiudi la connessione al database quando hai finito
+    res.sendFile(__dirname + "../public/")
 });
+
+// Esempio: seleziona tutti gli utenti dalla tabella Utenti
+
+  
+
+  
+
 module.exports = router;
