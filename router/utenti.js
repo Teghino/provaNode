@@ -1,18 +1,32 @@
 const express = require('express');
 const router = express.Router('../index.js');
-const fs = require('fs');
 const bodyParser = require('body-parser');
 const { dir } = require('console');
 const { dirname } = require('path');
 const sequelize = require('../sql/seq.js');
 const User = require('../sql/modello.js');
 const Sequelize = require('sequelize');
-const { exit } = require('process');
 
+var cors = require('cors');
+const corsOptions = {
+  origin: 'http://localhost:4200',
+  credentials: true,
+  optionSuccessStatus: 200
+}
 
+router.use(cors(corsOptions))
+
+router.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', "http://localhost:4200");
+  res.header('Access-Control-Allow-Headers', true);
+  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  next();
+});
 //router.use(bodyParser.json());
 router.use(bodyParser.urlencoded({ extended: true }));
 router.use(express.static('public'));
+
   
 router.post('/register',  (req, res) => {
     const dati = req.body;
@@ -21,7 +35,7 @@ router.post('/register',  (req, res) => {
         psw: dati.password,
       })
         .then((user) => {
-          res.send('Utente inserito correttamente')
+          res.send('Utente inserito correttamente');
           return;
         })
         .catch((error) => {
@@ -50,8 +64,7 @@ router.post('/login', (req, res) => {
       // Chiudi la connessione al database quando hai finito
     })
     .catch((error) => {
-      console.error('Errore:', error);
-      res.status(500).send('Internal Server Error');
+      res.status(500).send('Internal Server Error', 'errore:', error);
       // Chiudi la connessione al database quando hai finito
     });
 });
