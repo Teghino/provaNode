@@ -60,10 +60,10 @@ router.post('/login', (req, res) => {
   })
     .then((utente) => {
       if (utente == null) {
-        res.sendFile('accessofallito.html', { root: __dirname + '/../public' });
+        res.status(200).json({ exists: false, message: 'L\'utente non esiste.' });
       } else {
         console.log(utente);
-        res.status(200).send('Accesso effettuato correttamente');
+        res.status(200).json({ exists: true, message: 'L\'utente esiste.' });
       }
       // Chiudi la connessione al database quando hai finito
     })
