@@ -23,29 +23,33 @@ router.use(function (req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
   next();
 });
-//router.use(bodyParser.json());
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
+//router.use(bodyParser.urlencoded({ extended: true }));
+
 router.use(express.static('public'));
 
   
 router.post('/register',  (req, res) => {
+  console.log(req.body);
     const dati = req.body;
       User.create({
         email: dati.username,
         psw: dati.password,
       })
         .then((user) => {
-          res.send('Utente inserito correttamente');
+          res.status(200).json({ message: 'Registrazione avvenuta con successo' });
           return;
         })
         .catch((error) => {
+          console.log('nome utente già registrato');
+          if (error.name === 'SequelizeUniqueConstraintError') {
+            return res.status(400).json({ error: 'Email già registrata.' });
+          }
           console.error('Errore durante l\'inserimento dell\'utente:', error);
-          res.sendFile('registrazionefallita.html', {root : __dirname + '/../public'});
-          return;
+          return res.status(500).json({ error: 'Si è verificato un errore durante la registrazione.' });
         });
     // Chiudi la connessione al database quando hai finito
 });
-
 router.post('/login', (req, res) => {
   const dati = req.body;
   User.findOne({
@@ -69,4 +73,26 @@ router.post('/login', (req, res) => {
     });
 });
 
+router.get('/checkUser/:username', (req, res) => {
+  const requestedUsername = req.params.username; // Ottieni il nome utente dalla richiesta
+
+  // Esegui la logica per controllare se l'utente esiste nel database
+  User.findOne({
+    where: {
+      email: requestedUsername,
+    },
+  })
+    .then((utente) => {
+      if (utente == null) {
+        res.status(200).json({ exists: false, message: 'L\'utente non esiste.' });
+      } else {
+        res.status(200).json({ exists: true, message: 'L\'utente esiste.' });
+      }
+      // Chiudi la connessione al database quando hai finito
+    })
+    .catch((error) => {
+      res.status(500).send('Internal Server Error', 'errore:', error);
+      // Chiudi la connessione al database quando hai finito
+    });
+  });
 module.exports = router;
