@@ -8,6 +8,7 @@ const User = sequelize.define('account', {
     primaryKey: true,
   },
   psw: Sequelize.STRING,
+  nome: Sequelize.STRING,
   // Altri campi della tabella Utenti
 });
 

@@ -33,6 +33,7 @@ router.post('/register',  (req, res) => {
   console.log(req.body);
     const dati = req.body;
       User.create({
+        nome: dati.nome,
         email: dati.username,
         psw: dati.password,
       })
