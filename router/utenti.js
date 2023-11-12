@@ -44,7 +44,7 @@ router.post('/register',  (req, res) => {
         .catch((error) => {
           console.log('nome utente già registrato');
           if (error.name === 'SequelizeUniqueConstraintError') {
-            return res.status(400).json({ error: 'Email già registrata.' });
+            return res.status(409).json({ message: 'Email già registrata.' });
           }
           console.error('Errore durante l\'inserimento dell\'utente:', error);
           return res.status(500).json({ error: 'Si è verificato un errore durante la registrazione.' });
