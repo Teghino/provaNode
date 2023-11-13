@@ -6,6 +6,8 @@ const { dirname } = require('path');
 const sequelize = require('../sql/seq.js');
 const User = require('../sql/modello.js');
 const Sequelize = require('sequelize');
+const jwt = require('jsonwebtoken');
+
 
 var cors = require('cors');
 const corsOptions = {
@@ -30,6 +32,7 @@ router.use(express.static('public'));
 
   
 router.post('/register',  (req, res) => {
+  console.log(process.env.JWT_SECRET);
   console.log(req.body);
     const dati = req.body;
       User.create({
@@ -38,11 +41,11 @@ router.post('/register',  (req, res) => {
         psw: dati.password,
       })
         .then((user) => {
-          res.status(200).json({ message: 'Registrazione avvenuta con successo' });
+          const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+          res.status(200).json({ message: 'Registrazione avvenuta con successo', token: token });
           return;
         })
         .catch((error) => {
-          console.log('nome utente già registrato');
           if (error.name === 'SequelizeUniqueConstraintError') {
             return res.status(409).json({ message: 'Email già registrata.' });
           }
@@ -69,6 +72,7 @@ router.post('/login', (req, res) => {
       // Chiudi la connessione al database quando hai finito
     })
     .catch((error) => {
+      console.error('Errore durante il login:', error);
       res.status(500).send('Internal Server Error', 'errore:', error);
       // Chiudi la connessione al database quando hai finito
     });
