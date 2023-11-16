@@ -67,7 +67,10 @@ router.post('/login', (req, res) => {
         res.status(200).json({ exists: false, message: 'L\'utente non esiste.' });
       } else {
         console.log(utente);
-        res.status(200).json({ exists: true, message: 'L\'utente esiste.' });
+        const token = jwt.sign({ id: utente.id }, process.env.JWT_SECRET, {
+          expiresIn: 86400 // scade in 24 ore
+        });
+        res.status(200).json({ exists: true, message: 'L\'utente esiste.', token: token });
       }
       // Chiudi la connessione al database quando hai finito
     })
@@ -100,4 +103,28 @@ router.get('/checkUser/:username', (req, res) => {
       // Chiudi la connessione al database quando hai finito
     });
   });
+
+  router.get('/protected', verificaToken, (req, res) => {
+    // se il token è valido, req.userId conterrà l'id dell'utente
+    res.status(200).send({ message: 'Protected route accessed!', userId: req.userId });
+  });
+
+  function verificaToken(req, res, next) {
+    const token = req.headers['authorization'];
+
+    if (!token) {
+        return res.status(403).send({ auth: false, message: 'No token provided.' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+        }
+
+        // se tutto va bene, salva la richiesta per l'uso in altre rotte
+        req.userId = decoded.id;
+        next();
+    });
+}
+
 module.exports = router;
